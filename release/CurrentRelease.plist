@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Rules</key>
+	<array>
+		<dict>
+			<key>Codebase</key>
+			<string>http://bfleischer.github.com/macfuse/release/MacFUSE-2.1.dmg</string>
+			<key>Hash</key>
+			<string>4QvsXBUGXtObWDAuXuIK/dhbdTc=</string>
+			<key>Predicate</key>
+			<string>SystemVersion.ProductVersion beginswith "10.6" AND Ticket.version != "2.1.10"</string>
+			<key>ProductID</key>
+			<string>com.google.filesystems.fusefs</string>
+			<key>Size</key>
+			<string>2255137</string>
+			<key>Version</key>
+			<string>2.1.10</string>
+		</dict>
+	</array>
+	<key>Signature</key>
+	<data>
+	RlrGjpiYj6tGg48Mozz8He0Q9yySGhmTdNNAJmxSoWs9+ramC7TWRxc7HFCe51VbvsUU
+	MWwteRo3lv/iFr4cELQPtwr/t7laL3XPOi1Ylbg8xhJG1PPaypkQGuTma9AxJbW0EgVD
+	3mrXFSZntet7OcsA8kLUoz9M0rtuPzY0IzQ=
+	</data>
+</dict>
+</plist>
