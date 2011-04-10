@@ -1,0 +1,37 @@
+#!/bin/bash
+# Copyright 2011 Benjamin Fleischer. All rights reserved.
+
+function usage() {
+	echo "usage: libfuse_switch: mac-os-version libfuse-version"
+	exit 0
+}
+
+# Check arguments
+if [ $# -ne 2 -o "$1" = "-h" -o "$1" = "--help" ] ; then
+	usage
+fi
+
+MAC_OS_VERSION="$1"
+LIBFUSE_VERSION="$2"
+
+# Check directory libfuse
+LIBFUSE_DIR="`dirname $0`/../core/${MAC_OS_VERSION}/libfuse/"
+if [ ! -d "$LIBFUSE_DIR" ] ; then
+	echo "libfuse_switch: libfuse directory \"${LIBFUSE_DIR}\" not found"
+	exit 1
+fi
+
+# Create symbolic links
+SOURCE="fuse-${LIBFUSE_VERSION}.tar.gz"
+PATCH="fuse-${LIBFUSE_VERSION}-macosx.patch"
+if [ ! -f "${LIBFUSE_DIR}${SOURCE}" ] ; then
+	echo "libfuse_switch: libfuse source \"${SOURCE}\" not found"
+	exit 2
+fi
+if [ ! -f "${LIBFUSE_DIR}${PATCH}" ] ; then
+	echo "libfuse_switch: libfuse patch \"${PATCH}\" not found"
+	exit 2
+fi
+
+ln -sf "$SOURCE" "${LIBFUSE_DIR}fuse-current.tar.gz"
+ln -sf "$PATCH" "${LIBFUSE_DIR}fuse-current-macosx.patch"

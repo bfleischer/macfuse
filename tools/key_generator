@@ -1,0 +1,67 @@
+#!/bin/bash
+# Copyright 2011 Benjamin Fleischer. All rights reserved.
+
+# New line constant
+NL="
+"
+function usage() {
+	echo "usage: key_generator file-prefix"
+	exit 0
+}
+
+# Prints the C array representation of the specified DER key file
+function print_c_array() {
+	local c_array_name="$1"
+	local der_key_file="$2"
+	local i=0
+
+	echo "static unsigned char ${c_array_name}[] = {"
+	hexdump -e '1/1 "0x%02x\n"' -v "${der_key_file}" | while true ; do
+		read byte
+		if [ $? -ne 0 ] ; then
+			echo "${NL}};"
+			echo "static unsigned int ${c_array_name}_len = $i;"
+			break
+		fi
+		
+		let c=$i%16
+		if [ $i -eq 0 ] ; then
+			echo -n "${byte}"
+		elif [ $c -eq 0 ] ; then
+			echo -n ",${NL}${byte}"
+		elif [ $c -eq 15 ] ; then
+			echo -n ", ${byte}"
+		else
+			echo -n ", ${byte}"
+		fi
+		let i=$i+1
+	done
+}
+
+# Check arguments
+if [ $# -ne 1 -o "$1" = "-h" -o "$1" = "--help" ] ; then
+	usage
+fi
+
+# Key pair name
+PRIVATE_KEY="$1"
+PUBLIC_KEY="$1_pub"
+
+# Generate 1024 bit RSA key pair
+openssl genrsa -out "${PRIVATE_KEY}.pem" 1024 && \
+openssl rsa -in "${PRIVATE_KEY}.pem" -out "${PUBLIC_KEY}.pem" -pubout
+if [ $? -ne 0 ] ; then
+	echo "key_generator: failed to generate key pair"
+	exit 1
+fi
+
+# Convert key pair from PEM to DER
+openssl rsa -inform PEM -in "${PRIVATE_KEY}.pem" -outform DER -out "${PRIVATE_KEY}.der" && \
+openssl rsa -inform PEM -in "${PUBLIC_KEY}.pem" -outform DER -out "${PUBLIC_KEY}.der" -pubin
+if [ $? -ne 0 ] ; then
+	echo "key_generator: failed to convert key"
+	exit 2
+fi
+
+# Convert public key to c array macfuse_public_der
+print_c_array "macfuse_public_der" "${PUBLIC_KEY}.der" > "${PUBLIC_KEY}.txt"

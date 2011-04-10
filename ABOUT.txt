@@ -1,0 +1,1 @@
+MacFUSE is an implementation of the FUSE API for Mac OS X
