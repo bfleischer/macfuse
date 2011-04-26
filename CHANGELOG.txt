@@ -1,5 +1,11 @@
 = Changes and Feature Additions in MacFUSE Binary Releases =
 
+== MacFUSE 2.1.10 (April 26, 2011) ==
+
+  * Bugfix: Fixed a bug in "fuse.fs" kext that could cause a kernel deadlock (Erik Larrson, Tuxera).
+
+  * Dropped support for Mac OS X 10.5 (libfuse).
+
 == MacFUSE 2.1.10 (April 8, 2011) ==
 
   * This is an "unofficial" release: There has not been any official development at the MacFUSE project (http://code.google.com/p/macfuse/) since 2009 and no stable releases since December 2008. This release is based on the latest version of MacFUSE 2.1.7 that can be found in the the project's svn trunk.
