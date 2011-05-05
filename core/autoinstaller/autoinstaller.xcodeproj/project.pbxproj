@@ -790,10 +790,13 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F931FBEB0E92B6F9009FB4B0 /* DebugTigerOrLater.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
 				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = NO;
 				GCC_PREFIX_HEADER = autoinstaller_Prefix.pch;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				OTHER_LDFLAGS = "";
+				SDKROOT = macosx10.6;
 			};
 			name = Debug;
 		};
@@ -875,10 +878,12 @@
 		F9246C470E31BEFE004ADF93 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_VERSION = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = "Build All";
 				SDKROOT = macosx10.6;
 			};

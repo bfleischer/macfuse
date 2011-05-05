@@ -1655,7 +1655,11 @@
 			isa = PBXProject;
 			buildConfigurationList = F98DD3E40E5F4B5E00FE644D /* Build configuration list for PBXProject "UpdateEngine" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
 			mainGroup = F98DD3DF0E5F4B5E00FE644D;
 			productRefGroup = F9A7084D0E5F4BF3004B295E /* Products */;
 			projectDirPath = "";
@@ -2422,8 +2426,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F966F2CF0E81688C009FCD64 /* DebugTigerOrLater.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_PREFIX_HEADER = UpdateEngine.pch;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = UpdateEngine;
+				SDKROOT = macosx10.6;
 			};
 			name = Debug;
 		};
@@ -2431,8 +2439,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F966F2D00E81688C009FCD64 /* ReleaseTigerOrLater.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_PREFIX_HEADER = UpdateEngine.pch;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				PRODUCT_NAME = UpdateEngine;
+				SDKROOT = macosx10.6;
 			};
 			name = Release;
 		};
@@ -2502,6 +2514,7 @@
 				);
 				INFOPLIST_FILE = "Common/Test-Info.plist";
 				PRODUCT_NAME = "Common Tests";
+				SDKROOT = macosx10.6;
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
@@ -2516,6 +2529,7 @@
 				);
 				INFOPLIST_FILE = "Common/Test-Info.plist";
 				PRODUCT_NAME = "Common Tests";
+				SDKROOT = macosx10.6;
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;
