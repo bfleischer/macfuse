@@ -70,10 +70,6 @@ loopback_fgetattr(const char *path, struct stat *stbuf,
 
     (void)path;
 
-    printf(">>>> loopback_fgetattr\npath = %s\nfi->fh = %llu\n", path, fi->fh);
-    if (fi->fh == NULL) {
-        printf("!!!! fi->fh = NULL\n");
-    }
     res = fstat(fi->fh, stbuf);
     if (res == -1) {
         return -errno;
@@ -124,8 +120,7 @@ loopback_opendir(const char *path, struct fuse_file_info *fi)
     d->entry = NULL;
 
     fi->fh = (unsigned long)d;
-    printf(">>>> loopback_opendir\npath = %s\nfi->fh = %llu\n", path, fi->fh);
-    
+
     return 0;
 }
 
@@ -482,7 +477,6 @@ loopback_create(const char *path, mode_t mode, struct fuse_file_info *fi)
     }
 
     fi->fh = fd;
-    printf(">>>> loopback_create\npath = %s\nfi->fh = %llu\n", path, fi->fh);
     return 0;
 }
 
@@ -497,7 +491,6 @@ loopback_open(const char *path, struct fuse_file_info *fi)
     }
 
     fi->fh = fd;
-    printf(">>>> loopback_open\npath = %s\nfi->fh = %llu\n", path, fi->fh);
     return 0;
 }
 
