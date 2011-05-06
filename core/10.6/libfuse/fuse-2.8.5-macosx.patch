@@ -48237,8 +48237,8 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +#endif /* __FreeBSD__ >= 10 */
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/include/fuse_kernel.h fuse-2.8.5-macfuse/include/fuse_kernel.h
 --- fuse-2.8.5/include/fuse_kernel.h	2011-05-05 12:48:08.000000000 +0200
-+++ fuse-2.8.5-macfuse/include/fuse_kernel.h	2011-05-05 12:05:44.000000000 +0200
-@@ -106,15 +106,24 @@
++++ fuse-2.8.5-macfuse/include/fuse_kernel.h	2011-05-06 12:56:43.000000000 +0200
+@@ -106,16 +106,25 @@
  	__u64	atime;
  	__u64	mtime;
  	__u64	ctime;
@@ -48256,13 +48256,16 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	__u32	uid;
  	__u32	gid;
  	__u32	rdev;
- 	__u32	blksize;
+-	__u32	blksize;
+-	__u32	padding;
 +#if (__FreeBSD__ >= 10)
 +	__u32	flags; /* file flags; see chflags(2) */
 +#endif /* __FreeBSD__ >= 10 */
- 	__u32	padding;
++    __u32	blksize;
++    __u32	padding;
  };
  
+ struct fuse_kstatfs {
 @@ -151,6 +160,12 @@
  #define FATTR_ATIME_NOW	(1 << 7)
  #define FATTR_MTIME_NOW	(1 << 8)
@@ -48313,7 +48316,31 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	/* CUSE specific operations */
  	CUSE_INIT          = 4096,
  };
-@@ -321,6 +350,15 @@
+@@ -289,7 +318,11 @@
+ /* The read buffer is required to be at least 8k, but may be much larger */
+ #define FUSE_MIN_READ_BUFFER 8192
+ 
++#if (__FreeBSD__ >= 10)
++#define FUSE_COMPAT_ENTRY_OUT_SIZE 144
++#else
+ #define FUSE_COMPAT_ENTRY_OUT_SIZE 120
++#endif
+ 
+ struct fuse_entry_out {
+ 	__u64	nodeid;		/* Inode ID */
+@@ -312,7 +345,11 @@
+ 	__u64	fh;
+ };
+ 
++#if (__FreeBSD__ >= 10)
++#define FUSE_COMPAT_ATTR_OUT_SIZE 112
++#else
+ #define FUSE_COMPAT_ATTR_OUT_SIZE 96
++#endif
+ 
+ struct fuse_attr_out {
+ 	__u64	attr_valid;	/* Cache timeout for the attributes */
+@@ -321,6 +358,15 @@
  	struct fuse_attr attr;
  };
  
@@ -48329,7 +48356,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  #define FUSE_COMPAT_MKNOD_IN_SIZE 8
  
  struct fuse_mknod_in {
-@@ -339,6 +377,14 @@
+@@ -339,6 +385,14 @@
  	__u64	newdir;
  };
  
@@ -48344,7 +48371,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  struct fuse_link_in {
  	__u64	oldnodeid;
  };
-@@ -360,6 +406,15 @@
+@@ -360,6 +414,15 @@
  	__u32	uid;
  	__u32	gid;
  	__u32	unused5;
@@ -48360,7 +48387,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  };
  
  struct fuse_open_in {
-@@ -436,11 +491,19 @@
+@@ -436,11 +499,19 @@
  struct fuse_setxattr_in {
  	__u32	size;
  	__u32	flags;
