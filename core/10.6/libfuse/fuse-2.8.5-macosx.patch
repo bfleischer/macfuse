@@ -48237,7 +48237,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +#endif /* __FreeBSD__ >= 10 */
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/include/fuse_kernel.h fuse-2.8.5-macfuse/include/fuse_kernel.h
 --- fuse-2.8.5/include/fuse_kernel.h	2011-05-05 12:48:08.000000000 +0200
-+++ fuse-2.8.5-macfuse/include/fuse_kernel.h	2011-05-06 12:56:43.000000000 +0200
++++ fuse-2.8.5-macfuse/include/fuse_kernel.h	2011-05-06 13:59:48.000000000 +0200
 @@ -106,16 +106,25 @@
  	__u64	atime;
  	__u64	mtime;
@@ -48321,7 +48321,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  #define FUSE_MIN_READ_BUFFER 8192
  
 +#if (__FreeBSD__ >= 10)
-+#define FUSE_COMPAT_ENTRY_OUT_SIZE 144
++#define FUSE_COMPAT_ENTRY_OUT_SIZE 136
 +#else
  #define FUSE_COMPAT_ENTRY_OUT_SIZE 120
 +#endif
