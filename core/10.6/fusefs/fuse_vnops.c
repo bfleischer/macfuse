@@ -387,7 +387,7 @@ fuse_vnop_create(struct vnop_create_args *ap)
     fdisp_make(fdip, FUSE_CREATE, vnode_mount(dvp), parent_nodeid, context);
 
     foi = fdip->indata;
-//  foi->mode = mode;
+    foi->mode = mode;
 
     /* XXX: We /always/ creat() like this. Wish we were on Linux. */
     foi->flags = O_CREAT | O_RDWR;
