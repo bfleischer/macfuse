@@ -38620,7 +38620,7 @@ diff -Naur old/fuse.pc.in new/fuse.pc.in
  Version: @VERSION@
  Libs: -L${libdir} -lfuse @libfuse_libs@
 -Cflags: -I${includedir}/fuse -D_FILE_OFFSET_BITS=64
-+Cflags: -I${includedir}/fuse -D__FreeBSD__=10 -D_FILE_OFFSET_BITS=64
++Cflags: -I${includedir}/fuse -D__FreeBSD__=10 -D_FILE_OFFSET_BITS=64 -D__DARWIN_64_BIT_INO_T=0
 diff -Naur old/iconv.m4 new/iconv.m4
 --- old/iconv.m4	1969-12-31 16:00:00.000000000 -0800
 +++ new/iconv.m4	2009-10-18 19:42:37.000000000 -0700
