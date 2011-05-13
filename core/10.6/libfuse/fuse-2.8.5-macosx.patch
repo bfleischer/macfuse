@@ -50039,7 +50039,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iconv.Tpo $(DEPDIR)/iconv.Plo
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/fuse.c fuse-2.8.5-macfuse/lib/fuse.c
 --- fuse-2.8.5/lib/fuse.c	2011-05-05 12:48:08.000000000 +0200
-+++ fuse-2.8.5-macfuse/lib/fuse.c	2011-05-13 03:35:38.000000000 +0200
++++ fuse-2.8.5-macfuse/lib/fuse.c	2011-05-13 04:38:44.000000000 +0200
 @@ -17,6 +17,9 @@
  #include "fuse_common_compat.h"
  #include "fuse_compat.h"
@@ -50201,11 +50201,11 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  }
  
 +#if (__FreeBSD__ >= 10)
- int fuse_fs_getxattr(struct fuse_fs *fs, const char *path, const char *name,
--		     char *value, size_t size)
++int fuse_fs_getxattr(struct fuse_fs *fs, const char *path, const char *name,
 +		     char *value, size_t size, uint32_t position)
 +#else
-+int fuse_fs_getxattr(struct fuse_fs *fs, const char *path, const char *name,
+ int fuse_fs_getxattr(struct fuse_fs *fs, const char *path, const char *name,
+-		     char *value, size_t size)
 +		     char *value, size_t size);
 +#endif /* __FreeBSD__ >= 10 */
  {
@@ -50688,9 +50688,9 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  {
  	return &fuse_get_context_internal()->ctx;
  }
-+#if (__FreeBSD__ < 10)
++#if !(__FreeBSD__ >= 10)
  FUSE_SYMVER(".symver fuse_get_context_compat22,fuse_get_context@FUSE_2.2");
-+#endif /* __FreeBSD__ < 10 */
++#endif
  
  int fuse_getgroups(int size, gid_t list[])
  {
@@ -50917,14 +50917,14 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  				      11);
  }
  
-+#if (__FreeBSD__ < 10)
++#if !(__FreeBSD__ >= 10)
  FUSE_SYMVER(".symver fuse_exited,__fuse_exited@");
  FUSE_SYMVER(".symver fuse_process_cmd,__fuse_process_cmd@");
  FUSE_SYMVER(".symver fuse_read_cmd,__fuse_read_cmd@");
  FUSE_SYMVER(".symver fuse_set_getcontext_func,__fuse_set_getcontext_func@");
  FUSE_SYMVER(".symver fuse_new_compat2,fuse_new@");
  FUSE_SYMVER(".symver fuse_new_compat22,fuse_new@FUSE_2.2");
-+#endif /* __FreeBSD__ < 10 */
++#endif
  
  #endif /* __FreeBSD__ */
  
@@ -50932,9 +50932,9 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  					op_size, 25);
  }
  
-+#if (__FreeBSD__ < 10)
++#if !(__FreeBSD__ >= 10)
  FUSE_SYMVER(".symver fuse_new_compat25,fuse_new@FUSE_2.5");
-+#endif /* __FreeBSD__ < 10 */
++#endif
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/fuse_darwin.c fuse-2.8.5-macfuse/lib/fuse_darwin.c
 --- fuse-2.8.5/lib/fuse_darwin.c	1970-01-01 01:00:00.000000000 +0100
 +++ fuse-2.8.5-macfuse/lib/fuse_darwin.c	2011-05-11 23:59:06.000000000 +0200
@@ -51455,7 +51455,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/fuse_lowlevel.c fuse-2.8.5-macfuse/lib/fuse_lowlevel.c
 --- fuse-2.8.5/lib/fuse_lowlevel.c	2011-05-05 12:48:08.000000000 +0200
-+++ fuse-2.8.5-macfuse/lib/fuse_lowlevel.c	2011-05-11 23:59:06.000000000 +0200
++++ fuse-2.8.5-macfuse/lib/fuse_lowlevel.c	2011-05-13 04:39:36.000000000 +0200
 @@ -47,8 +47,42 @@
  	attr->atimensec = ST_ATIM_NSEC(stbuf);
  	attr->mtimensec = ST_MTIM_NSEC(stbuf);
@@ -51664,9 +51664,9 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  {
  	return fuse_req_ctx(req);
  }
-+#if (__FreeBSD__ < 10)
++#if !(__FreeBSD__ >= 10)
  FUSE_SYMVER(".symver fuse_req_ctx_compat24,fuse_req_ctx@FUSE_2.4");
-+#endif /* __FreeBSD__ < 10 */
++#endif
  
  
  void fuse_req_interrupt_func(fuse_req_t req, fuse_interrupt_func_t func,
@@ -51700,11 +51700,11 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	return 0;
  }
  
-+#if (__FreeBSD__ < 10)
++#if !(__FreeBSD__ >= 10)
  FUSE_SYMVER(".symver fuse_reply_statfs_compat,fuse_reply_statfs@FUSE_2.4");
  FUSE_SYMVER(".symver fuse_reply_open_compat,fuse_reply_open@FUSE_2.4");
  FUSE_SYMVER(".symver fuse_lowlevel_new_compat,fuse_lowlevel_new@FUSE_2.4");
-+#endif /* __FreeBSD__ < 10 */
++#endif
  
  #else /* __FreeBSD__ */
  
@@ -51712,31 +51712,31 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  					op_size, userdata);
  }
  
-+#if (__FreeBSD__ < 10)
++#if !(__FreeBSD__ >= 10)
  FUSE_SYMVER(".symver fuse_lowlevel_new_compat25,fuse_lowlevel_new@FUSE_2.5");
-+#endif /* __FreeBSD__ < 10 */
++#endif
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/fuse_mt.c fuse-2.8.5-macfuse/lib/fuse_mt.c
 --- fuse-2.8.5/lib/fuse_mt.c	2011-05-05 12:48:08.000000000 +0200
-+++ fuse-2.8.5-macfuse/lib/fuse_mt.c	2011-05-11 23:59:06.000000000 +0200
++++ fuse-2.8.5-macfuse/lib/fuse_mt.c	2011-05-13 04:40:28.000000000 +0200
 @@ -113,4 +113,6 @@
  	return fuse_session_loop_mt(fuse_get_session(f));
  }
  
-+#if (__FreeBSD__ < 10)
++#if !(__FreeBSD__ >= 10)
  FUSE_SYMVER(".symver fuse_loop_mt_proc,__fuse_loop_mt@");
-+#endif /* __FreeBSD__ < 10 */
++#endif
 \ No newline at end of file
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/fuse_opt.c fuse-2.8.5-macfuse/lib/fuse_opt.c
 --- fuse-2.8.5/lib/fuse_opt.c	2011-05-05 12:48:08.000000000 +0200
-+++ fuse-2.8.5-macfuse/lib/fuse_opt.c	2011-05-11 23:59:06.000000000 +0200
++++ fuse-2.8.5-macfuse/lib/fuse_opt.c	2011-05-13 04:41:02.000000000 +0200
 @@ -405,5 +405,7 @@
  	return res;
  }
  
-+#if (__FreeBSD__ < 10)
++#if !(__FreeBSD__ >= 10)
  /* This symbol version was mistakenly added to the version script */
  FUSE_SYMVER(".symver fuse_opt_insert_arg_compat,fuse_opt_insert_arg@FUSE_2.5");
-+#endif /* __FreeBSD__ < 10 */
++#endif
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/fuse_session.c fuse-2.8.5-macfuse/lib/fuse_session.c
 --- fuse-2.8.5/lib/fuse_session.c	2011-05-05 12:48:08.000000000 +0200
 +++ fuse-2.8.5-macfuse/lib/fuse_session.c	2011-05-11 23:59:06.000000000 +0200
@@ -51795,7 +51795,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	set_one_signal_handler(SIGINT, SIG_DFL);
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/helper.c fuse-2.8.5-macfuse/lib/helper.c
 --- fuse-2.8.5/lib/helper.c	2011-05-05 12:48:08.000000000 +0200
-+++ fuse-2.8.5-macfuse/lib/helper.c	2011-05-11 23:59:06.000000000 +0200
++++ fuse-2.8.5-macfuse/lib/helper.c	2011-05-13 04:42:11.000000000 +0200
 @@ -12,6 +12,9 @@
  #include "fuse_opt.h"
  #include "fuse_lowlevel.h"
@@ -51867,13 +51867,13 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	return fuse_mount_compat22(mountpoint, NULL);
  }
  
-+#if (__FreeBSD__ < 10)
++#if !(__FreeBSD__ >= 10)
  FUSE_SYMVER(".symver fuse_setup_compat2,__fuse_setup@");
  FUSE_SYMVER(".symver fuse_setup_compat22,fuse_setup@FUSE_2.2");
  FUSE_SYMVER(".symver fuse_teardown,__fuse_teardown@");
  FUSE_SYMVER(".symver fuse_main_compat2,fuse_main@");
  FUSE_SYMVER(".symver fuse_main_real_compat22,fuse_main_real@FUSE_2.2");
-+#endif /* __FreeBSD__ < 10 */
++#endif
  
  #endif /* __FreeBSD__ */
  
@@ -51881,12 +51881,12 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	return fuse_kern_mount(mountpoint, args);
  }
  
-+#if (__FreeBSD__ < 10)
++#if !(__FreeBSD__ >= 10)
  FUSE_SYMVER(".symver fuse_setup_compat25,fuse_setup@FUSE_2.5");
  FUSE_SYMVER(".symver fuse_teardown_compat22,fuse_teardown@FUSE_2.2");
  FUSE_SYMVER(".symver fuse_main_real_compat25,fuse_main_real@FUSE_2.5");
  FUSE_SYMVER(".symver fuse_mount_compat25,fuse_mount@FUSE_2.5");
-+# endif /* __FreeBSD__ < 10 */
++# endif
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/modules/iconv.c fuse-2.8.5-macfuse/lib/modules/iconv.c
 --- fuse-2.8.5/lib/modules/iconv.c	2011-05-05 12:48:08.000000000 +0200
 +++ fuse-2.8.5-macfuse/lib/modules/iconv.c	2011-05-11 23:59:06.000000000 +0200
