@@ -50039,7 +50039,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/iconv.Tpo $(DEPDIR)/iconv.Plo
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/fuse.c fuse-2.8.5-macfuse/lib/fuse.c
 --- fuse-2.8.5/lib/fuse.c	2011-05-05 12:48:08.000000000 +0200
-+++ fuse-2.8.5-macfuse/lib/fuse.c	2011-05-11 23:59:06.000000000 +0200
++++ fuse-2.8.5-macfuse/lib/fuse.c	2011-05-13 03:35:38.000000000 +0200
 @@ -17,6 +17,9 @@
  #include "fuse_common_compat.h"
  #include "fuse_compat.h"
@@ -50060,15 +50060,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  };
  
  struct fusemod_so {
-@@ -93,6 +99,7 @@
- 	unsigned int generation;
- 	unsigned int hidectr;
- 	pthread_mutex_t lock;
-+	pthread_rwlock_t tree_lock;
- 	struct fuse_config conf;
- 	int intr_installed;
- 	struct fuse_fs *fs;
-@@ -1075,6 +1082,26 @@
+@@ -1075,6 +1081,26 @@
  	return fs->op.statfs(fs->compat == 25 ? "/" : path, buf);
  }
  
@@ -50095,7 +50087,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  #endif /* __FreeBSD__ */
  
  int fuse_fs_getattr(struct fuse_fs *fs, const char *path, struct stat *buf)
-@@ -1124,6 +1151,69 @@
+@@ -1124,6 +1150,69 @@
  	}
  }
  
@@ -50165,7 +50157,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  int fuse_fs_unlink(struct fuse_fs *fs, const char *path)
  {
  	fuse_get_context()->private_data = fs->user_data;
-@@ -1226,7 +1316,7 @@
+@@ -1226,7 +1315,7 @@
  			fprintf(stderr, "open flags: 0x%x %s\n", fi->flags,
  				path);
  
@@ -50174,7 +50166,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  
  		if (fs->debug && !err)
  			fprintf(stderr, "   open[%lli] flags: 0x%x %s\n",
-@@ -1598,31 +1688,59 @@
+@@ -1598,31 +1687,59 @@
  	}
  }
  
@@ -50236,7 +50228,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	} else {
  		return -ENOSYS;
  	}
-@@ -1790,6 +1908,16 @@
+@@ -1790,6 +1907,16 @@
  
  static void curr_time(struct timespec *now)
  {
@@ -50253,7 +50245,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	static clockid_t clockid = CLOCK_MONOTONIC;
  	int res = clock_gettime(clockid, now);
  	if (res == -1 && errno == EINVAL) {
-@@ -1800,6 +1928,7 @@
+@@ -1800,6 +1927,7 @@
  		perror("fuse: clock_gettime");
  		abort();
  	}
@@ -50261,7 +50253,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  }
  
  static void update_stat(struct node *node, const struct stat *stbuf)
-@@ -2089,6 +2218,108 @@
+@@ -2089,6 +2217,105 @@
  		return -ENOSYS;
  }
  
@@ -50284,11 +50276,9 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +	struct stat buf;
 +	char *path;
 +	int err;
-+	
-+	err = -ENOENT;
-+	pthread_rwlock_rdlock(&f->tree_lock);
++
 +	err = get_path(f, ino, &path);
-+	if (path != NULL) {
++	if (!err) {
 +		struct fuse_intr_data d;
 +		fuse_prepare_interrupt(f, req, &d);
 +		err = 0;
@@ -50350,9 +50340,8 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +		if (!err)
 +			err = fuse_fs_getattr(f->fs,  path, &buf);
 +		fuse_finish_interrupt(f, req, &d);
-+		free(path);
++		free_path(f, ino, path);
 +	}
-+	pthread_rwlock_unlock(&f->tree_lock);
 +	if (!err) {
 +		if (f->conf.auto_cache) {
 +			pthread_mutex_lock(&f->lock);
@@ -50370,7 +50359,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  static void fuse_lib_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *attr,
  			     int valid, struct fuse_file_info *fi)
  {
-@@ -2102,6 +2333,32 @@
+@@ -2102,6 +2329,32 @@
  		struct fuse_intr_data d;
  		fuse_prepare_interrupt(f, req, &d);
  		err = 0;
@@ -50403,7 +50392,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  		if (!err && (valid & FUSE_SET_ATTR_MODE))
  			err = fuse_fs_chmod(f->fs, path, attr->st_mode);
  		if (!err && (valid & (FUSE_SET_ATTR_UID | FUSE_SET_ATTR_GID))) {
-@@ -2119,6 +2376,23 @@
+@@ -2119,6 +2372,23 @@
  				err = fuse_fs_truncate(f->fs, path,
  						       attr->st_size);
  		}
@@ -50427,7 +50416,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  		if (!err &&
  		    (valid & (FUSE_SET_ATTR_ATIME | FUSE_SET_ATTR_MTIME)) ==
  		    (FUSE_SET_ATTR_ATIME | FUSE_SET_ATTR_MTIME)) {
-@@ -2129,6 +2403,7 @@
+@@ -2129,6 +2399,7 @@
  			tv[1].tv_nsec = ST_MTIM_NSEC(attr);
  			err = fuse_fs_utimens(f->fs, path, tv);
  		}
@@ -50435,7 +50424,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  		if (!err)
  			err = fuse_fs_getattr(f->fs,  path, &buf);
  		fuse_finish_interrupt(f, req, &d);
-@@ -2346,6 +2621,134 @@
+@@ -2346,6 +2617,128 @@
  	reply_err(req, err);
  }
  
@@ -50487,13 +50476,13 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +	struct fuse *f = req_fuse_prepare(req);
 +	int err;
 +	
-+	pthread_rwlock_rdlock(&f->tree_lock);
++	pthread_mutex_lock(&f->lock);
 +	struct fuse_intr_data d;
 +	fuse_prepare_interrupt(f, req, &d);
 +	err = fuse_fs_setvolname(f->fs, volname);
++    pthread_mutex_unlock(&f->lock);
 +	fuse_finish_interrupt(f, req, &d);
-+	pthread_rwlock_unlock(&f->tree_lock);
-+	
++    
 +	reply_err(req, err);
 +}
 +
@@ -50506,12 +50495,10 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +	char *newpath;
 +	int err;
 +	
-+	err = -ENOENT;
-+	pthread_rwlock_wrlock(&f->tree_lock);
 +	err = get_path_name(f, olddir, oldname, &oldpath);
-+	if (oldpath != NULL) {
++	if (!err) {
 +		err = get_path_name(f, newdir, newname, &newpath);
-+		if (newpath != NULL) {
++		if (!err) {
 +			struct fuse_intr_data d;
 +			if (f->conf.debug)
 +				fprintf(stderr, "EXCHANGE %s -> %s\n", oldpath,
@@ -50527,11 +50514,10 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +                                                            options);
 +			}
 +			fuse_finish_interrupt(f, req, &d);
-+			free(newpath);
++			free_path(f, newdir, newpath);
 +		}
-+		free(oldpath);
++		free_path(f, olddir, oldpath);
 +	}
-+	pthread_rwlock_unlock(&f->tree_lock);
 +	reply_err(req, err);
 +}
 +
@@ -50548,17 +50534,14 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +	memset(&bkuptime, 0, sizeof(bkuptime));
 +	memset(&crtime, 0, sizeof(crtime));
 +	
-+	err = -ENOENT;
-+	pthread_rwlock_rdlock(&f->tree_lock);
 +	err = get_path(f, ino, &path);
-+	if (path != NULL) {
++	if (!err) {
 +		struct fuse_intr_data d;
 +		fuse_prepare_interrupt(f, req, &d);
 +		err = fuse_fs_getxtimes(f->fs, path, &bkuptime, &crtime);
 +		fuse_finish_interrupt(f, req, &d);
-+		free(path);
++		free_path(f, ino, path);
 +	}
-+	pthread_rwlock_unlock(&f->tree_lock);
 +	if (!err) {
 +		fuse_reply_xtimes(req, &bkuptime, &crtime);
 +	} else
@@ -50570,7 +50553,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  static void fuse_lib_link(fuse_req_t req, fuse_ino_t ino, fuse_ino_t newparent,
  			  const char *newname)
  {
-@@ -2469,15 +2872,28 @@
+@@ -2469,15 +2862,28 @@
  			pthread_mutex_unlock(&f->lock);
  			err = fuse_fs_fgetattr(f->fs, path, &stbuf, fi);
  			pthread_mutex_lock(&f->lock);
@@ -50600,7 +50583,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	node->cache_valid = 1;
  	pthread_mutex_unlock(&f->lock);
  }
-@@ -2867,8 +3283,13 @@
+@@ -2867,8 +3273,13 @@
  		reply_err(req, err);
  }
  
@@ -50614,7 +50597,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  {
  	struct fuse *f = req_fuse_prepare(req);
  	char *path;
-@@ -2878,15 +3299,24 @@
+@@ -2878,15 +3289,24 @@
  	if (!err) {
  		struct fuse_intr_data d;
  		fuse_prepare_interrupt(f, req, &d);
@@ -50639,7 +50622,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  {
  	int err;
  	char *path;
-@@ -2895,15 +3325,24 @@
+@@ -2895,15 +3315,24 @@
  	if (!err) {
  		struct fuse_intr_data d;
  		fuse_prepare_interrupt(f, req, &d);
@@ -50664,7 +50647,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  {
  	struct fuse *f = req_fuse_prepare(req);
  	int res;
-@@ -2914,14 +3353,22 @@
+@@ -2914,14 +3343,22 @@
  			reply_err(req, -ENOMEM);
  			return;
  		}
@@ -50687,7 +50670,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  		if (res >= 0)
  			fuse_reply_xattr(req, res);
  		else
-@@ -3366,6 +3813,13 @@
+@@ -3366,6 +3803,13 @@
  	.bmap = fuse_lib_bmap,
  	.ioctl = fuse_lib_ioctl,
  	.poll = fuse_lib_poll,
@@ -50701,7 +50684,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  };
  
  int fuse_notify_poll(struct fuse_pollhandle *ph)
-@@ -3465,7 +3919,9 @@
+@@ -3465,7 +3909,9 @@
  {
  	return &fuse_get_context_internal()->ctx;
  }
@@ -50711,7 +50694,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  
  int fuse_getgroups(int size, gid_t list[])
  {
-@@ -3657,6 +4113,9 @@
+@@ -3657,6 +4103,9 @@
  	}
  
  	fs->user_data = user_data;
@@ -50721,7 +50704,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	if (op)
  		memcpy(&fs->op, op, op_size);
  	return fs;
-@@ -3793,6 +4252,11 @@
+@@ -3793,6 +4242,11 @@
  	root->nlookup = 1;
  	hash_id(f, root);
  
@@ -50733,7 +50716,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	return f;
  
  out_free_root_name:
-@@ -3830,6 +4294,10 @@
+@@ -3830,6 +4284,10 @@
  {
  	size_t i;
  
@@ -50744,7 +50727,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	if (f->conf.intr && f->intr_installed)
  		fuse_restore_intr_signal(f->conf.intr_signal);
  
-@@ -3897,6 +4365,185 @@
+@@ -3897,6 +4355,185 @@
  	fuse_modules = mod;
  }
  
@@ -50930,7 +50913,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  #ifndef __FreeBSD__
  
  static struct fuse *fuse_new_common_compat(int fd, const char *opts,
-@@ -3947,12 +4594,14 @@
+@@ -3947,12 +4584,14 @@
  				      11);
  }
  
@@ -50945,7 +50928,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  
  #endif /* __FreeBSD__ */
  
-@@ -3964,4 +4613,6 @@
+@@ -3964,4 +4603,6 @@
  					op_size, 25);
  }
  
