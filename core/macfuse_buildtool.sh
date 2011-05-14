@@ -559,19 +559,15 @@ function m_handler_examples()
     m_exit_on_error "cannot patch MacFUSE library source."
 
     m_log "configuring library source"
-    /bin/sh ./darwin_configure_ino64.sh "$kernel_dir" >$m_stdout 2>$m_stderr
+    /bin/sh ./darwin_configure.sh "$kernel_dir" >$m_stdout 2>$m_stderr
     m_exit_on_error "cannot configure MacFUSE library source for compilation."
 
     cd example
     m_exit_on_error "cannot access examples source."
 
     local me_installed_lib="/usr/local/lib/libfuse_ino64.la"
-    if [ "$m_platform" == "10.4" ]
-    then
-        me_installed_lib="/usr/local/lib/libfuse.la"
-    fi
 
-    perl -pi -e "s#../lib/libfuse.la#$me_installed_lib#g" Makefile
+    perl -pi -e "s#../lib/libfuse_ino64.la#$me_installed_lib#g" Makefile
     m_exit_on_error "failed to prepare example source for build."
 
     m_log "running make"
@@ -1156,53 +1152,12 @@ function m_handler_smalldist()
     ln -s libfuse.dylib "$ms_macfuse_root/usr/local/lib/libfuse.0.dylib"
     m_exit_on_error "cannot create compatibility symlink."
 
-    rm -f "ms_macfuse_root"/usr/local/lib/*ulockmgr*
-    # ignore any errors
+    # generate dsym
+    dsymutil "$ms_macfuse_root"/usr/local/lib/libfuse.dylib
+    m_exit_on_error "cannot generate debugging information for libfuse."
+    dsymutil "$ms_macfuse_root"/usr/local/lib/libfuse_ino64.dylib
+    m_exit_on_error "cannot generate debugging information for libfuse_ino64."
 
-    rm -f "ms_macfuse_root"/usr/local/include/*ulockmgr*
-    # ignore any errors
-
-    # Now build again, if necessary, with 64-bit inode support
-    #
-
-    # ino64 is not supported on Tiger
-
-    if [ "$m_platform" != "10.4" ]
-    then
-
-        m_log "building user-space MacFUSE library (ino64)"
-
-        cd "$ms_macfuse_build"/fuse*/lib
-        m_exit_on_error "cannot access MacFUSE library (ino64) source in '$ms_macfuse_build/fuse*/lib'."
-
-        make clean >$m_stdout 2>$m_stderr
-        m_exit_on_error "make failed while compiling the MacFUSE library (ino64)."
-
-        perl -pi -e 's#libfuse#libfuse_ino64#g' Makefile
-        m_exit_on_error "failed to prepare MacFUSE library (ino64) for compilation."
-
-        perl -pi -e 's#-D__DARWIN_64_BIT_INO_T=0##g' Makefile
-        m_exit_on_error "failed to prepare MacFUSE library (ino64) for compilation."
-
-        make -j2 >$m_stdout 2>$m_stderr
-        m_exit_on_error "make failed while compiling the MacFUSE library (ino64)."
-
-        make install DESTDIR="$ms_macfuse_root" >$m_stdout 2>$m_stderr
-        m_exit_on_error "cannot prepare MacFUSE library (ino64) build for installation."
-
-        rm -f "$ms_macfuse_root"/usr/local/lib/*ulockmgr*
-        # ignore any errors
-
-        rm -f "$ms_macfuse_root"/usr/local/include/*ulockmgr*
-        # ignore any errors
-
-        # generate dsym
-        dsymutil "$ms_macfuse_root"/usr/local/lib/libfuse.dylib
-        m_exit_on_error "cannot generate debugging information for libfuse."
-        dsymutil "$ms_macfuse_root"/usr/local/lib/libfuse_ino64.dylib
-        m_exit_on_error "cannot generate debugging information for libfuse_ino64."
-
-    fi # ino64 on > Tiger
 
     # Build MacFUSE.framework
     #
