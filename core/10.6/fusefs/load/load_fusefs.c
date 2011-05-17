@@ -39,9 +39,9 @@
 int
 main(__unused int argc, __unused const char *argv[])
 {
-    int    pid = -1;
+    pid_t  pid = -1;
     int    result = -1;
-    union  wait status;
+    int    status;
     char   version[MAXHOSTNAMELEN + 1] = { 0 };
     size_t version_len = MAXHOSTNAMELEN;
     size_t version_len_desired = 0;
@@ -93,8 +93,8 @@ need_unloading:
     }
 
     /* Success! */
-    if ((wait4(pid, (int *)&status, 0, NULL) == pid) && (WIFEXITED(status))) {
-        result = status.w_retcode;
+    if ((waitpid(pid, &status, 0) == pid) && (WIFEXITED(status))) {
+        result = status;
     } else {
         result = -1;
     }
@@ -121,8 +121,8 @@ need_loading:
     }
     
     /* Success! */
-    if ((wait4(pid, (int *)&status, 0, NULL) == pid) && (WIFEXITED(status))) {
-        result = status.w_retcode;
+    if ((waitpid(pid, &status, 0) == pid) && (WIFEXITED(status))) {
+        result = status;
     } else {
         result = -1;
     }
