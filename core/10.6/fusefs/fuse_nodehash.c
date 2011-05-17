@@ -119,7 +119,7 @@ static size_t       gFSNodeSize;
 static OSMallocTag  gOSMallocTag;
 
 /*
- *gHashMutex is a single mutex that protects all fields (except the immutable
+ * gHashMutex is a single mutex that protects all fields (except the immutable
  * ones) of all HNodes, the hash table itself (all elements of the gHashTable
  * array), and gHashNodeCount.
  */
