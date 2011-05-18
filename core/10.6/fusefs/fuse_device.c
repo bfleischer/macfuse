@@ -122,22 +122,14 @@ static struct cdevsw fuse_device_cdevsw = {
     /* read     */ fuse_device_read,
     /* write    */ fuse_device_write,
     /* ioctl    */ fuse_device_ioctl,
-    /* stop     */ (d_stop_t *)enodev,
-    /* reset    */ (d_reset_t *)enodev,
-    /* ttys     */ 0,
+    /* stop     */ eno_stop,
+    /* reset    */ eno_reset,
+    /* ttys     */ NULL,
     /* select   */ fuse_device_select,
-    /* mmap     */ (d_mmap_t *)enodev,
-    /* strategy */ (d_strategy_t *)enodev_strat,
-#ifdef d_getc_t
-    /* getc     */ (d_getc_t *)enodev,
-#else
-    /* reserved */ (void *)enodev,
-#endif
-#ifdef d_putc_t
-    /* putc     */ (d_putc_t *)enodev,
-#else
-    /* reserved */ (void *)enodev,
-#endif
+    /* mmap     */ eno_mmap,
+    /* strategy */ eno_strat,
+    /* getc     */ eno_getc,
+    /* putc     */ eno_putc,
     /* flags    */ D_TTY,
 };
 
