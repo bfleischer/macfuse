@@ -12,6 +12,7 @@
 #include "fuse_nodehash.h"
 #include "fuse_sysctl.h"
 
+#include <stdbool.h>
 #include <fuse_ioctl.h>
 #include <libkern/libkern.h>
 
@@ -25,8 +26,8 @@
             (var) && ((tvar) = TAILQ_NEXT((var), field), 1); \
             (var) = (tvar))
 
-static int    fuse_cdev_major          = -1;
-static UInt32 fuse_interface_available = FALSE;
+static int  fuse_cdev_major          = -1;
+static bool fuse_interface_available = false;
 
 struct fuse_device {
     lck_mtx_t        *mtx;
@@ -143,7 +144,7 @@ fuse_device_open(dev_t dev, __unused int flags, __unused int devtype,
 
     fuse_trace_printf_func();
 
-    if (fuse_interface_available == FALSE) {
+    if (!fuse_interface_available) {
         return ENOENT;
     }
 
@@ -505,7 +506,7 @@ fuse_devices_start(void)
                                                            fuse_lock_attr);
     }
 
-    fuse_interface_available = TRUE;
+    fuse_interface_available = true;
 
     return KERN_SUCCESS;
 
@@ -530,7 +531,7 @@ fuse_devices_stop(void)
 
     fuse_trace_printf_func();
 
-    fuse_interface_available = FALSE;
+    fuse_interface_available = false;
 
     FUSE_DEVICE_GLOBAL_LOCK();
 
@@ -544,7 +545,7 @@ fuse_devices_stop(void)
         char p_comm[MAXCOMLEN + 1] = { '?', '\0' };
 
         if (fuse_device_table[i].usecount != 0) {
-            fuse_interface_available = TRUE;
+            fuse_interface_available = true;
             FUSE_DEVICE_GLOBAL_UNLOCK();
             proc_name(fuse_device_table[i].pid, p_comm, MAXCOMLEN + 1);
             IOLog("MacFUSE: /dev/fuse%d is still active (pid=%d %s)\n",
@@ -553,7 +554,7 @@ fuse_devices_stop(void)
         }
 
         if (fuse_device_table[i].data != NULL) {
-            fuse_interface_available = TRUE;
+            fuse_interface_available = true;
             FUSE_DEVICE_GLOBAL_UNLOCK();
             proc_name(fuse_device_table[i].pid, p_comm, MAXCOMLEN + 1);
             /* The pid can't possibly be active here. */
