@@ -52299,8 +52299,8 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +FUSE_REGISTER_MODULE(volicon, volicon_new);
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/mount_darwin.c fuse-2.8.5-macfuse/lib/mount_darwin.c
 --- fuse-2.8.5/lib/mount_darwin.c	1970-01-01 01:00:00.000000000 +0100
-+++ fuse-2.8.5-macfuse/lib/mount_darwin.c	2011-05-15 06:19:22.000000000 +0200
-@@ -0,0 +1,787 @@
++++ fuse-2.8.5-macfuse/lib/mount_darwin.c	2011-05-20 00:50:41.000000000 +0200
+@@ -0,0 +1,753 @@
 +/*
 + * Amit Singh <singh@>
 + * 
@@ -52358,7 +52358,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +    if (ret != 0) {
 +        return -1;
 +    }
-+
++    
 +    c = strchr(u.release, '.');
 +    if (c == NULL) {
 +        return -1;
@@ -52394,8 +52394,8 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +loadkmod(void)
 +{
 +    int result = -1;
-+    int pid, terminated_pid;
-+    union wait status;
++    pid_t pid, terminated_pid;
++    int status;
 +    long major;
 +
 +    major = fuse_os_version_major_np();
@@ -52415,7 +52415,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +
 +    require_action(pid != -1, Return, result = errno);
 +
-+    while ((terminated_pid = wait4(pid, (int *)&status, 0, NULL)) < 0) {
++    while ((terminated_pid = waitpid(pid, &status, 0)) < 0) {
 +        /* retry if EINTR, else break out with error */
 +        if (errno != EINTR) {
 +            break;
@@ -52769,10 +52769,9 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +        return;
 +    }
 +
-+    rp = realpath(mountpoint, resolved_path);
-+    if (rp) {
-+        ret = unmount(resolved_path, 0);
-+    }
++    close(fd);
++
++    unmount(mountpoint, MNT_FORCE);
 +
 +    return;
 +}
@@ -52780,13 +52779,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +void
 +fuse_unmount_compat22(const char *mountpoint)
 +{
-+    char resolved_path[PATH_MAX];
-+    char *rp = realpath(mountpoint, resolved_path);
-+    if (rp) {
-+        (void)unmount(resolved_path, 0);
-+    }
-+
-+    return;
++    unmount(mountpoint, MNT_FORCE);
 +}
 +
 +static int
@@ -52798,7 +52791,6 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +    pid_t pid, cpid;
 +    int status;
 +    const char *mountprog = MACFUSE_MOUNT_PROG;
-+    sigset_t block_mask, old_mask;
 +    
 +    if (!mountpoint) {
 +        fprintf(stderr, "missing or invalid mount point\n");
@@ -52810,19 +52802,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +        return -1;
 +    }
 +
-+    sigemptyset(&block_mask);
-+    sigaddset(&block_mask, SIGCHLD);
-+
-+    if(sigprocmask(SIG_BLOCK, &block_mask, &old_mask) == -1) {
-+        perror("MacFUSE: failed to set signal mask");
-+    }
-+
 +    result = loadkmod();
-+
-+    if(sigprocmask(SIG_SETMASK, &old_mask, NULL) == -1) {
-+        perror("MacFUSE: failed to restore signal mask");
-+    }
-+    
 +    if (result) {
 +        CFOptionFlags responseFlags;
 +        if (result == EINVAL) {
@@ -52951,18 +52931,13 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +    if (getenv("FUSE_NO_MOUNT") || ! mountpoint)
 +        goto out;
 +
-+    if(sigprocmask(SIG_BLOCK, &block_mask, &old_mask) < 0) {
-+        perror("MacFUSE: failed to set signal mask");
-+    }
-+    
 +    pid = fork();
 +    cpid = pid;
 +    
 +    if (pid == -1) {
 +        perror("MacFUSE: fork() failed");
 +        close(fd);
-+        fd = -1;
-+        goto restore_mask;
++        return -1;
 +    }
 +
 +    if (pid == 0) {
@@ -52978,10 +52953,6 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +            const char *argv[32];
 +            int a = 0;
 +
-+            if (sigprocmask(SIG_SETMASK, &old_mask, NULL) == -1) {
-+                perror("MacFUSE: failed to restore signal mask");
-+            }
-+            
 +            if (! fdnam)
 +                asprintf(&fdnam, "%d", fd);
 +
@@ -53011,16 +52982,11 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +    }
 +    
 +    if (waitpid(cpid, &status, 0) == -1 || WEXITSTATUS(status) != 0) {
-+		perror("MacFUSE: failed to mount file system");
-+		close(fd);
-+		fd = -1;
-+	}
-+
-+restore_mask:
-+    if (sigprocmask(SIG_SETMASK, &old_mask, NULL) == -1) {
-+        perror("MacFUSE: failed to restore signal mask");
++        perror("MacFUSE: failed to mount file system");
++        close(fd);
++        return -1;
 +    }
-+    
++
 +out:
 +    return fd;
 +}
