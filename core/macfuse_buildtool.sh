@@ -1314,15 +1314,7 @@ function m_handler_swconfigure()
     local current_product=`basename "$current_dir"`
 
     local extra_cflags=""
-    local architectures=""
-
-    if [ "$m_platform" == "10.4" ]
-    then
-        extra_cflags="-mmacosx-version-min=10.4"
-        architectures="-arch i386 -arch ppc"
-    else
-        architectures="-arch i386 -arch ppc"
-    fi
+    local architectures="-arch i386 -arch x86_64"
 
     local common_cflags="-O0 -g $architectures -isysroot $m_usdk_dir -I/usr/local/include"
     local common_ldflags="-Wl,-syslibroot,$m_usdk_dir $architectures -L/usr/local/lib"
