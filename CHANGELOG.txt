@@ -1,6 +1,6 @@
 = Changes and Feature Additions in MacFUSE Binary Releases =
 
-== MacFUSE 2.1.10 (April 26, 2011) ==
+== MacFUSE 2.1.11 (April 26, 2011) ==
 
   * Bugfix: Fixed a bug in "fuse.fs" kext that could cause a kernel deadlock (Erik Larrson, Tuxera).
 
