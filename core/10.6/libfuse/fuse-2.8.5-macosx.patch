@@ -47609,7 +47609,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  struct fuse_getxattr_out {
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/include/fuse_lowlevel.h fuse-2.8.5-macfuse/include/fuse_lowlevel.h
 --- fuse-2.8.5/include/fuse_lowlevel.h	2011-05-05 12:48:08.000000000 +0200
-+++ fuse-2.8.5-macfuse/include/fuse_lowlevel.h	2011-05-11 23:59:06.000000000 +0200
++++ fuse-2.8.5-macfuse/include/fuse_lowlevel.h	2011-05-27 17:50:42.000000000 +0200
 @@ -123,6 +123,12 @@
  #define FUSE_SET_ATTR_MTIME	(1 << 5)
  #define FUSE_SET_ATTR_ATIME_NOW	(1 << 7)
@@ -47655,43 +47655,45 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
  	/**
  	 * List extended attribute names
  	 *
-@@ -873,6 +889,40 @@
+@@ -873,6 +889,42 @@
  	 */
  	void (*poll) (fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi,
  		      struct fuse_pollhandle *ph);
 +	
 +#if (__FreeBSD__ >= 10)
-+	
-+        void (*reserved00) (fuse_req_t req, fuse_ino_t ino,
-+                            void *, void *, void *, void *, void *, void *);
-+        void (*reserved01) (fuse_req_t req, fuse_ino_t ino,
-+                            void *, void *, void *, void *, void *, void *);
-+        void (*reserved02) (fuse_req_t req, fuse_ino_t ino,
-+                            void *, void *, void *, void *, void *, void *);
-+        void (*reserved03) (fuse_req_t req, fuse_ino_t ino,
-+                            void *, void *, void *, void *, void *, void *);
-+        void (*reserved04) (fuse_req_t req, fuse_ino_t ino,
-+                            void *, void *, void *, void *, void *, void *);
-+        void (*reserved05) (fuse_req_t req, fuse_ino_t ino,
-+                            void *, void *, void *, void *, void *, void *);
-+        void (*reserved06) (fuse_req_t req, fuse_ino_t ino,
-+                            void *, void *, void *, void *, void *, void *);
-+        void (*reserved07) (fuse_req_t req, fuse_ino_t ino,
-+                            void *, void *, void *, void *, void *, void *);
-+	
-+        void (*setvolname) (fuse_req_t req, const char *name);
-+	
++
++	void (*reserved00) (fuse_req_t req, fuse_ino_t ino,
++			    void *, void *, void *, void *, void *, void *);
++	void (*reserved01) (fuse_req_t req, fuse_ino_t ino,
++			    void *, void *, void *, void *, void *, void *);
++	void (*reserved02) (fuse_req_t req, fuse_ino_t ino,
++			    void *, void *, void *, void *, void *, void *);
++	void (*reserved03) (fuse_req_t req, fuse_ino_t ino,
++			    void *, void *, void *, void *, void *, void *);
++	void (*reserved04) (fuse_req_t req, fuse_ino_t ino,
++			    void *, void *, void *, void *, void *, void *);
++	void (*reserved05) (fuse_req_t req, fuse_ino_t ino,
++			    void *, void *, void *, void *, void *, void *);
++	void (*reserved06) (fuse_req_t req, fuse_ino_t ino,
++			    void *, void *, void *, void *, void *, void *);
++	void (*reserved07) (fuse_req_t req, fuse_ino_t ino,
++			    void *, void *, void *, void *, void *, void *);
++	void (*reserved08) (fuse_req_t req, fuse_ino_t ino,
++			    void *, void *, void *, void *, void *, void *);
++
++	void (*setvolname) (fuse_req_t req, const char *name);
++
 +	void (*exchange) (fuse_req_t req, fuse_ino_t parent, const char *name,
 +			  fuse_ino_t newparent, const char *newname,
-+                          unsigned long options);
-+	
-+        void (*getxtimes) (fuse_req_t req, fuse_ino_t ino,
++			  unsigned long options);
++
++	void (*getxtimes) (fuse_req_t req, fuse_ino_t ino,
 +			   struct fuse_file_info *);
-+	
++
 +	void (*setattr_x) (fuse_req_t req, fuse_ino_t ino,
 +			   struct setattr_x *attr, int to_set,
 +			   struct fuse_file_info *fi);
-+	
++
 +#endif /* __FreeBSD__ >= 10 */
  };
  
@@ -52299,7 +52301,7 @@ diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git 
 +FUSE_REGISTER_MODULE(volicon, volicon_new);
 diff --text --unified --new-file --recursive --exclude=.DS_Store --exclude=.git fuse-2.8.5/lib/mount_darwin.c fuse-2.8.5-macfuse/lib/mount_darwin.c
 --- fuse-2.8.5/lib/mount_darwin.c	1970-01-01 01:00:00.000000000 +0100
-+++ fuse-2.8.5-macfuse/lib/mount_darwin.c	2011-05-20 00:50:41.000000000 +0200
++++ fuse-2.8.5-macfuse/lib/mount_darwin.c	2011-05-20 15:58:36.000000000 +0200
 @@ -0,0 +1,753 @@
 +/*
 + * Amit Singh <singh@>
