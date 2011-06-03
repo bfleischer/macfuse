@@ -15,7 +15,12 @@ export PATH
 #         Therefore, do not set M_CONF_TMPDIR to such a directory.
 #
 readonly M_CONF_TMPDIR=/tmp
-readonly M_CONF_PRIVKEY=`dirname $0`/../../keys/macfuse.der
+
+privkey="`dirname $0`/../../keys/macfuse.der"
+if [ ! -f "$privkey" ]; then
+	privkey="`dirname $0`/autoinstaller/TestKeys/private_key.der"
+fi
+readonly M_CONF_PRIVKEY="$privkey"
 
 # Other constants
 #
